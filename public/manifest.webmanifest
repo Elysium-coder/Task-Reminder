@@ -1,0 +1,12 @@
+{
+  "name": "Task Reminder",
+  "short_name": "TaskReminder",
+  "description": "Task Reminder — OTP auth, push/email/SMS reminders, paywall subscriptions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
