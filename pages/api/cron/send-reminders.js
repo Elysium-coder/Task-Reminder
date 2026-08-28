@@ -30,7 +30,6 @@ export default allowMethods(
     requireCron(req);
 
     await connectDB();
-
     const now = new Date();
     const dueTasks = await Task.find({
       reminderAt: { $lte: now },
@@ -77,5 +76,5 @@ export default allowMethods(
 
     return res.status(200).json({ delivered, total: dueTasks.length, errors });
   }),
-  ['POST']
+  ['GET', 'POST']
 );
