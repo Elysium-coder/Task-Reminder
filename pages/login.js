@@ -33,6 +33,8 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
+        // Don't let the button hang forever — abort after 12s.
+        signal: AbortSignal.timeout(12000),
       });
       // The server may respond with non-JSON (e.g. a platform 502 HTML page,
       // or a network-level body) — parse defensively so we never fail silently.
@@ -54,7 +56,16 @@ export default function LoginPage() {
         `/verify-otp?identifier=${encodeURIComponent(value)}&method=${method}&next=${encodeURIComponent(next)}`
       );
     } catch (err) {
-      setError(err.message);
+      // A raw TypeError from fetch ("Failed to fetch") means the server never
+      // responded at all — network drop, cold-start kill, or function timeout.
+      // AbortSignal timeouts land here as TimeoutError/AbortError.
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+        setError('The request timed out. Please try again in a moment.');
+      } else if (err instanceof TypeError && /fetch/i.test(err.message)) {
+        setError('Could not reach the server. Please check your connection and try again in a moment.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setSubmitting(false);
     }
