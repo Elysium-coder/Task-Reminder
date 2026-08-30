@@ -47,7 +47,23 @@ export default allowMethods(
           html: otpEmailHtml(code),
         });
       } catch (e) {
-        console.error('[/api/auth/request-otp] email send failed:', e.message);
+        // Comprehensive diagnostics: full error object, cause chain, and
+        // which provider env vars are configured (values never logged).
+        console.error('[/api/auth/request-otp] email send failed:', {
+          message: e?.message,
+          code: e?.code,
+          status: e?.status,
+          command: e?.command,
+          response: e?.response,
+          cause: e?.cause?.message || e?.cause,
+          stack: e?.stack,
+          providerConfig: {
+            smtp: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
+            smtpHost: process.env.SMTP_HOST || null,
+            smtpPort: process.env.SMTP_PORT || null,
+            resend: Boolean(process.env.RESEND_API_KEY),
+          },
+        });
         if (process.env.NODE_ENV !== 'development') {
           throw apiError('Could not send the verification email. Please try again later.', 502);
         }
@@ -56,7 +72,12 @@ export default allowMethods(
       try {
         await sendSMS({ to: identifier, message: otpSmsText(code) });
       } catch (e) {
-        console.error('[/api/auth/request-otp] SMS send failed:', e.message);
+        console.error('[/api/auth/request-otp] SMS send failed:', {
+          message: e?.message,
+          code: e?.code,
+          status: e?.status,
+          stack: e?.stack,
+        });
         if (process.env.NODE_ENV !== 'development') {
           throw apiError('Could not send the verification SMS. Please try again later.', 502);
         }

@@ -34,8 +34,20 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send code');
+      // The server may respond with non-JSON (e.g. a platform 502 HTML page,
+      // or a network-level body) — parse defensively so we never fail silently.
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+      if (!res.ok) {
+        throw new Error(
+          data.error ||
+            `Could not send the code (HTTP ${res.status}). Please check your connection and try again.`
+        );
+      }
 
       setDevCode(data.code || '');
       router.push(
