@@ -37,7 +37,7 @@ export default allowMethods(
     const code = await storeOtp(identifier, channel);
 
     if (channel === 'email') {
-      // In development, SMTP is usually not wired up. If sending fails we still
+      // In development, Resend may not be wired up. If sending fails we still
       // report the code so local testing is possible — NEVER do this in prod.
       try {
         await sendEmail({
@@ -51,18 +51,11 @@ export default allowMethods(
         // which provider env vars are configured (values never logged).
         console.error('[/api/auth/request-otp] email send failed:', {
           message: e?.message,
-          code: e?.code,
           status: e?.status,
-          command: e?.command,
-          response: e?.response,
           cause: e?.cause?.message || e?.cause,
           stack: e?.stack,
-          providerConfig: {
-            smtp: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
-            smtpHost: process.env.SMTP_HOST || null,
-            smtpPort: process.env.SMTP_PORT || null,
-            resend: Boolean(process.env.RESEND_API_KEY),
-          },
+          resendConfigured: Boolean(process.env.RESEND_API_KEY),
+          resendFrom: process.env.RESEND_FROM || null,
         });
         if (process.env.NODE_ENV !== 'development') {
           throw apiError('Could not send the verification email. Please try again later.', 502);
