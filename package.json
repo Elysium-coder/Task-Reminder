@@ -4,7 +4,7 @@
   "private": true,
   "description": "Task Reminder — OTP auth, push/email/SMS reminders, paywall subscriptions",
   "engines": {
-        "node": ">=18.0.0 <23.0.0",
+    "node": ">=18.0.0 <23.0.0",
     "npm": ">=9"
   },
   "scripts": {
@@ -37,5 +37,8 @@
     "@next/swc-win32-arm64-msvc": "14.2.33",
     "@next/swc-win32-ia32-msvc": "14.2.33",
     "@next/swc-win32-x64-msvc": "14.2.33"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.15.13"
   }
 }
